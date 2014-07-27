@@ -1,9 +1,11 @@
-#include <QCoreApplication>
-#include "diceapi.h"
+#include "mainwindow.h"
+
+#include <QApplication>
 
 
 int main(int argc, char *argv[])
 {
+    /*
     QCoreApplication a(argc, argv);
     DiceAuthorizer auth;
     auth.authorize(authUrl);
@@ -12,7 +14,11 @@ int main(int argc, char *argv[])
     QJsonObject repl = api.getJobsList("ios");
     //qDebug() << repl;
     QJsonObject jobInfo = api.getJobInfo("201aa3136587319466e985b513e159bf");
-    qDebug() << jobInfo;
+    qDebug() << jobInfo;*/
+
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
     return a.exec();
 }
 

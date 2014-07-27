@@ -48,7 +48,7 @@ void DiceAuthorizer::processReply(QNetworkReply* reply)
 
 }
 
-QString DiceAuthorizer::getToken()
+const QString DiceAuthorizer::getToken() const
 {
     return token;
 }
@@ -77,6 +77,23 @@ void DiceAPI::setCredentials(QNetworkReply* reply, QAuthenticator* auth)
     auth->setUser(APIUserName);
 }
 
+void DiceAPI::onReplyFinished()
+{
+    //check if reply is valid
+    QNetworkReply *reply = dynamic_cast<QNetworkReply*>(sender());
+    if(reply && (reply->error() == QNetworkReply::NoError) )
+    {
+        //parsing JSON reply to get access_token
+        QJsonDocument parsedReply = QJsonDocument::fromJson(QString(reply->readAll()).toUtf8());
+        QJsonObject jsonObj = parsedReply.object();
+        emit jobInfoRecevied(jsonObj);
+    }
+    else
+    {
+        throw;
+    }
+}
+
 void DiceAPI::replyRecieved(QNetworkReply* reply)
 {
     if(reply->error() == QNetworkReply::NoError)
@@ -98,7 +115,7 @@ QJsonObject DiceAPI::getJobsList(const QString& query)
     QUrl url(apiUrl);
     url.setQuery(qry);
     QNetworkRequest request(url);
-    request.setRawHeader(QByteArray("Authorization"), QByteArray((APIUserName+" "+token).toStdString().c_str()));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray((APIUserName + " " + token).toStdString().c_str()));
 
     QNetworkReply* reply = mgr.get(request);
     QEventLoop loop;
@@ -120,28 +137,13 @@ QJsonObject DiceAPI::getJobsList(const QString& query)
 
 }
 
-QJsonObject DiceAPI::getJobInfo(const QString& jobId)
+void DiceAPI::getJobInfo(const QString& jobId)
 {
     QUrl url(apiUrl+"/"+jobId);
     QNetworkRequest request(url);
-    request.setRawHeader(QByteArray("Authorization"), QByteArray((APIUserName+" "+token).toStdString().c_str()));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray((APIUserName + " " + token).toStdString().c_str()));
 
-    QNetworkReply* reply = mgr.get(request);
-    QEventLoop loop;
-    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    //check if reply is valid
-    if(reply->error() == QNetworkReply::NoError)
-    {
-        //parsing JSON reply to get access_token
-        QJsonDocument parsedReply = QJsonDocument::fromJson(QString(reply->readAll()).toUtf8());
-        QJsonObject jsonObj = parsedReply.object();
-        return jsonObj;
-    }
-    else
-    {
-        throw;
-    }
+    QNetworkReply *reply = mgr.get(request);
+    connect(reply, SIGNAL(finished()), this, SLOT(onReplyFinished()), Qt::UniqueConnection);
 
 }

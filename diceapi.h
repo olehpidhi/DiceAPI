@@ -30,9 +30,9 @@ private:
 public:
     explicit DiceAuthorizer(QObject* parent = 0);
     void authorize(const QUrl &authUrl);
-    QString getToken();
+    const QString getToken() const;
 public slots:
-    void setCredentials(QNetworkReply*reply, QAuthenticator*authenticator);
+    void setCredentials(QNetworkReply *reply, QAuthenticator *authenticator);
     void processReply(QNetworkReply*);
 };
 
@@ -40,23 +40,29 @@ public slots:
 class DiceAPI : public QObject
 {
     Q_OBJECT
-private:
-    QString token;
-    QJsonObject JSONReply;
-    QNetworkAccessManager mgr;
+
 public:
    explicit DiceAPI(QObject* parent = 0);
    DiceAPI(QString token, QObject* parent = 0);
    QJsonObject getJobsList(const QString& query);
-   QJsonObject getJobInfo(const QString& jobId);
+   void getJobInfo(const QString& jobId);
    void setToken(const QString& token);
 
 signals:
+   void jobInfoRecevied(const QJsonObject &);
+   void jobListRecevied(const QJsonObject &);
 
 public slots:
     void replyRecieved(QNetworkReply*);
     void setCredentials(QNetworkReply*,QAuthenticator*);
 
+private slots:
+    void onReplyFinished();
+
+private:
+    QString token;
+    QJsonObject JSONReply;
+    QNetworkAccessManager mgr;
 };
 
 #endif // DICEAPI_H

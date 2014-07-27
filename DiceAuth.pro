@@ -4,22 +4,26 @@
 #
 #-------------------------------------------------
 
-QT       += core
-
-QT       -= gui
+QT       += core gui
 
 QT       += network
 
-TARGET = DiceAuth
-CONFIG   += console
-CONFIG   -= app_bundle
-CONFIG +=c++11
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+TARGET = DiceAuth
 TEMPLATE = app
+CONFIG += c++11
 
 
 SOURCES += main.cpp \
-    diceapi.cpp
+    diceapi.cpp \
+    mainwindow.cpp \
+    filtermodel.cpp
 
 HEADERS += \
-    diceapi.h
+    diceapi.h \
+    mainwindow.h \
+    filtermodel.h
+
+FORMS += \
+    mainwindow.ui
