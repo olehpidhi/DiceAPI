@@ -90,7 +90,7 @@ void DiceAPI::replyRecieved(QNetworkReply* reply)
     }
 }
 
-QJsonObject DiceAPI::getData(const QString& query)
+QJsonObject DiceAPI::getJobsList(const QString& query)
 {    
     QUrlQuery qry(apiUrl);
     qry.addQueryItem("fields", "id, company, position");
@@ -98,7 +98,33 @@ QJsonObject DiceAPI::getData(const QString& query)
     QUrl url(apiUrl);
     url.setQuery(qry);
     QNetworkRequest request(url);
-    request.setRawHeader(QByteArray("Authorization"), QByteArray((QString("bearer")+" "+token).toStdString().c_str()));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray((APIUserName+" "+token).toStdString().c_str()));
+
+    QNetworkReply* reply = mgr.get(request);
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    //check if reply is valid
+    if(reply->error() == QNetworkReply::NoError)
+    {
+        //parsing JSON reply to get access_token
+        QJsonDocument parsedReply = QJsonDocument::fromJson(QString(reply->readAll()).toUtf8());
+        QJsonObject jsonObj = parsedReply.object();
+        return jsonObj;
+    }
+    else
+    {
+        throw;
+    }
+
+}
+
+QJsonObject DiceAPI::getJobInfo(const QString& jobId)
+{
+    QUrl url(apiUrl+"/"+jobId);
+    QNetworkRequest request(url);
+    request.setRawHeader(QByteArray("Authorization"), QByteArray((APIUserName+" "+token).toStdString().c_str()));
 
     QNetworkReply* reply = mgr.get(request);
     QEventLoop loop;

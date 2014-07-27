@@ -47,7 +47,8 @@ private:
 public:
    explicit DiceAPI(QObject* parent = 0);
    DiceAPI(QString token, QObject* parent = 0);
-   QJsonObject getData(const QString& query);
+   QJsonObject getJobsList(const QString& query);
+   QJsonObject getJobInfo(const QString& jobId);
    void setToken(const QString& token);
 
 signals:
