@@ -8,7 +8,7 @@ FilterModel::FilterModel(QObject *parent) :
 
 bool FilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    if(sourceModel()->data(sourceModel()->index(source_row, 3)).toString() == "open")
+    //if(sourceModel()->data(sourceModel()->index(source_row, 3)).toString() == "open")
         return true;
-    return false;
+    //return false;
 }

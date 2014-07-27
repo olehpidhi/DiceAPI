@@ -21,8 +21,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connectSignals();
     model = new QStandardItemModel(0, 4, this);
     proxyModel = new FilterModel(this);
+    proxyModel->setSourceModel(model);
     ui->tableView->setModel(proxyModel);
-    getJobs();
+    getJobs("android");
+    getJobs("ios");
+    getJobs("mobile");
+    getJobs("windows phone");
 }
 
 MainWindow::~MainWindow()
@@ -56,9 +60,9 @@ void MainWindow::authorize()
     }
 }
 
-void MainWindow::getJobs()
+void MainWindow::getJobs(const QString &str)
 {
-    QJsonObject repl = api->getJobsList("android");
+    QJsonObject repl = api->getJobsList(str);
     QJsonArray jsonArray = repl.value("searchResults").toArray();
     const int size = jsonArray.count();
     const int rows = model->rowCount();
@@ -74,5 +78,4 @@ void MainWindow::getJobs()
         api->getJobInfo(id);
         hash.insert(id, i + rows);
     }
-    proxyModel->setSourceModel(model);
 }

@@ -29,7 +29,7 @@ private slots:
 private:
     void connectSignals();
     void authorize();
-    void getJobs();
+    void getJobs(const QString &str);
 
 private:
     Ui::MainWindow *ui;
