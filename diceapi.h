@@ -11,6 +11,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QEventLoop>
 
 const QUrl authUrl = QUrl("https://secure.dice.com/oauth/token?grant_type=client_credentials");
 const QUrl apiUrl = QUrl("https://api.dice.com/jobs");
@@ -42,8 +43,10 @@ private:
     QJsonObject JSONReply;
     QNetworkAccessManager mgr;
 public:
-    explicit DiceAPI(QObject *parent = 0);
+   explicit DiceAPI(QObject* parent = 0);
+   DiceAPI(QString token, QObject* parent = 0);
    QJsonObject getData(const QString& query);
+   void setToken(const QString& token);
 
 signals:
 

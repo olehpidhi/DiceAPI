@@ -5,26 +5,28 @@ DiceAuthorizer::DiceAuthorizer(QObject* parent):
     token(QString(""))
 {
     connect(&mgr, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(setCredentials(QNetworkReply*,QAuthenticator*)));
-    connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(processReply(QNetworkReply*)));
 }
 
 void DiceAuthorizer::authorize(const QUrl &authUrl)
-{
+{    
     //creating request and setting
     //content type header
     QNetworkRequest request(authUrl);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     //sending request and getting reply
-    mgr.get(request);
-
+    QNetworkReply* reply = mgr.get(request);
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+    processReply(reply);
 }
-
 
 //method invokes if server authorization is needed
 //connected to
 //QNetworkAccessManager.authenticationNeeded(QNetworkReply* reply, QAuthenticator* authenticator) signal
 void DiceAuthorizer::setCredentials(QNetworkReply* reply, QAuthenticator* authenticator)
 {
+    Q_UNUSED(reply);
     authenticator->setUser(userName);
     authenticator->setPassword(password);
 }
@@ -38,7 +40,6 @@ void DiceAuthorizer::processReply(QNetworkReply* reply)
         QJsonDocument parsedReply = QJsonDocument::fromJson(QString(reply->readAll()).toUtf8());
         QJsonObject jsonObj = parsedReply.object();
         token = jsonObj["access_token"].toString();
-        qDebug() << token;
     }
     else
     {
@@ -60,7 +61,14 @@ DiceAPI::DiceAPI(QObject *parent):
     JSONReply(QJsonObject())
 {
     connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyRecieved(QNetworkReply*)));
+}
 
+DiceAPI::DiceAPI(QString pToken, QObject *parent):
+    QObject(parent),
+    token(pToken),
+    JSONReply(QJsonObject())
+{
+    connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyRecieved(QNetworkReply*)));
 }
 
 void DiceAPI::replyRecieved(QNetworkReply* reply)
