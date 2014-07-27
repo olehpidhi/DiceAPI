@@ -8,6 +8,9 @@ int main(int argc, char *argv[])
     DiceAuthorizer auth;
     auth.authorize(authUrl);
 
+    DiceAPI api(auth.getToken());
+    QJsonObject repl = api.getData("ios");
+    qDebug() << repl;
     return a.exec();
 }
 

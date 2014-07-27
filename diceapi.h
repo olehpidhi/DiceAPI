@@ -14,10 +14,12 @@
 #include <QEventLoop>
 
 const QUrl authUrl = QUrl("https://secure.dice.com/oauth/token?grant_type=client_credentials");
-const QUrl apiUrl = QUrl("https://api.dice.com/jobs");
+const QString apiUrl = "https://api.dice.com/jobs";
 
 const QString userName = "diceHackathon";
 const QString password = "9fc52528-080d-4f0c-becd-45acf46bac4e";
+
+const QString APIUserName = "bearer";
 
 class DiceAuthorizer : public QObject
 {
@@ -52,6 +54,7 @@ signals:
 
 public slots:
     void replyRecieved(QNetworkReply*);
+    void setCredentials(QNetworkReply*,QAuthenticator*);
 
 };
 

@@ -68,7 +68,13 @@ DiceAPI::DiceAPI(QString pToken, QObject *parent):
     token(pToken),
     JSONReply(QJsonObject())
 {
-    connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyRecieved(QNetworkReply*)));
+    connect(&mgr, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this, SLOT(setCredentials(QNetworkReply*,QAuthenticator*)));
+}
+
+void DiceAPI::setCredentials(QNetworkReply* reply, QAuthenticator* auth)
+{
+    auth->setPassword(token);
+    auth->setUser(APIUserName);
 }
 
 void DiceAPI::replyRecieved(QNetworkReply* reply)
@@ -85,13 +91,19 @@ void DiceAPI::replyRecieved(QNetworkReply* reply)
 }
 
 QJsonObject DiceAPI::getData(const QString& query)
-{
-    QNetworkRequest request(apiUrl);
+{    
     QUrlQuery qry(apiUrl);
     qry.addQueryItem("fields", "id, company, position");
     qry.addQueryItem("q",query);
+    QUrl url(apiUrl);
+    url.setQuery(qry);
+    QNetworkRequest request(url);
+    request.setRawHeader(QByteArray("Authorization"), QByteArray((QString("bearer")+" "+token).toStdString().c_str()));
 
     QNetworkReply* reply = mgr.get(request);
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
 
     //check if reply is valid
     if(reply->error() == QNetworkReply::NoError)
