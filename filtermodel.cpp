@@ -8,7 +8,11 @@ FilterModel::FilterModel(QObject *parent) :
 
 bool FilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
-    //if(sourceModel()->data(sourceModel()->index(source_row, 3)).toString() == "open")
+//    QString itemToFilter = sourceModel()->data(sourceModel()->index(source_row, 2)).toString().toLower();
+//    if(itemToFilter.contains("california"))
+//    {
         return true;
-    //return false;
+//    }
+
+//    return false;
 }

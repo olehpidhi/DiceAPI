@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 #include <QHash>
-
+#include <string>
+#include <sstream>
 class DiceAuthorizer;
 class DiceAPI;
 class QAbstractItemModel;
@@ -40,5 +41,7 @@ private:
     QHash<QString, int> hash;
 
 };
+
+QString formatJson(const QJsonObject&);
 
 #endif // MAINWINDOW_H

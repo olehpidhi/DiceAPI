@@ -100,6 +100,7 @@ void DiceAPI::replyRecieved(QNetworkReply* reply)
     {
         QJsonDocument parsedReply = QJsonDocument::fromJson(QString(reply->readAll()).toUtf8());
         JSONReply = parsedReply.object();
+        emit jobInfoRecevied(JSONReply);
     }
     else
     {

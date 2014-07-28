@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     getJobs("ios");
     getJobs("mobile");
     getJobs("windows phone");
+
 }
 
 MainWindow::~MainWindow()
@@ -36,13 +37,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::itemClicked(const QModelIndex &index)
 {
-    //QJsonObject jobInfo = api->getJobInfo(model->data(model->index(index.row(), 0), Qt::UserRole).toString());
-    //ui->textBrowser->setText(jobInfo.value("description").toString());
+    api->getJobInfo(model->data(model->index(index.row(), 0), Qt::UserRole).toString());
 }
 
 void MainWindow::onJobInfoRecevied(const QJsonObject &jobInfo)
 {
     model->setData(model->index(hash[jobInfo.value("id").toString()], 3), jobInfo.value("payRate").toString());
+    ui->textBrowser->setHtml(formatJson(jobInfo));
 }
 
 void MainWindow::connectSignals()
@@ -78,4 +79,59 @@ void MainWindow::getJobs(const QString &str)
         api->getJobInfo(id);
         hash.insert(id, i + rows);
     }
+}
+
+QString formatJson(const QJsonObject& toFormat)
+{
+
+
+    QJsonObject company = toFormat["company"].toObject();
+    QJsonObject apply =  toFormat["apply"].toObject();
+    QJsonObject position = toFormat["position"].toObject();
+    QJsonObject location = position["location"].toObject();
+    std::ostringstream htmlStream;
+    htmlStream << "<p><strong>Company</strong></p>" <<
+                  "<ul>" <<
+                  "<li>Name:"<<company["name"].toString().toStdString()<<"<//li>"<<
+                  "<li>Web Site"<<company["compURL"].toString().toStdString()<<"<//li>"<<
+                  "<//ul>"<<
+                  "<p><strong>Application<//strong><//p>"<<
+                  "<ul>"<<
+                  "<li>Application Method:"<<apply["applicationMethod"].toString().toStdString()<<"<//li>"<<
+                  "<li>Email:"<<apply["email"].toString().toStdString()<<"<//li>"<<
+                  "</ul>"<<
+                  "<p>Creation Date</p>"<<
+                  "<ul>"<<
+                  "<li>"<<toFormat["creationDate"].toString().toStdString()<<"</li>"<<
+                  "</ul>"<<
+                  "<p>Description</p>"<<
+                  "<ul>"<<
+                  "<li>"<<toFormat["description"].toString().toStdString()<<"</li>"<<
+                  "</ul>"<<
+                  "<p><strong>Job Length</strong></p>"<<
+                  "<ul>"<<
+                  "<li>"<<toFormat["jobLength"].toString().toStdString()<<"</li>"
+                  "</ul>"<<
+                  "<p><strong>Pay Rate</strong></p>"<<
+                  "<ul>"<<
+                  "<li>"<<toFormat["payRate"].toString().toStdString()<<"</li></ul>"<<
+                  "<p><strong>Position</strong></p>"<<
+                  "<ul><li>Title:"<<position["title"].toString().toStdString()<<"</li><li>Location<ul>"<<
+                  "<li>"<<location["city"].toString().toStdString()<<"</li>"
+                  "<li>"<<location["country"].toString().toStdString()<<"</li>"
+                  "<li>"<<location["postalCode"].toString().toStdString()<<"</li>"<<
+                  "<li>"<<location["region"].toString().toStdString()<<"</li>"<<
+                  "</ul></li></ul>"<<
+                  "<p><strong>Status</strong></p>"<<
+                  "<ul><li>"<<toFormat["status"].toString().toStdString()<<"</li>"<<
+                  "</ul><p><strong>Skills</strong></p><ul>"<<
+                  "<li>"<<toFormat["skills"].toString().toStdString()<<"</li></ul>"<<
+                  "<p><strong>Tax Terms</strong></p><ul>"<<
+                  "<li>"<<toFormat["taxTerms"].toString().toStdString()<<"</li>"<<
+                  "</ul>"<<
+                  "<p><strong>Telecommute option</strong></p><ul>"<<
+                  "<li>"<<toFormat["telecommuteOption"].toString().toStdString()<<"</li></ul>"<<
+                  "<p><strong>Link to Dice</strong>"<<toFormat["webURL"].toString().toStdString()<<"</p>";
+    QString htmlData = QString::fromStdString(htmlStream.str());
+    return htmlData;
 }
