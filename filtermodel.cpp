@@ -10,5 +10,5 @@ bool FilterModel::filterAcceptsRow(int source_row, const QModelIndex &source_par
 {
     //if(sourceModel()->data(sourceModel()->index(source_row, 3)).toString() == "open")
         return true;
-    //return false;
+        //return false;
 }

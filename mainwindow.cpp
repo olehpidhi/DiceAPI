@@ -36,13 +36,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::itemClicked(const QModelIndex &index)
 {
-    //QJsonObject jobInfo = api->getJobInfo(model->data(model->index(index.row(), 0), Qt::UserRole).toString());
-    //ui->textBrowser->setText(jobInfo.value("description").toString());
+    QJsonObject jobInfo = model->data(model->index(index.row(), 3), Qt::UserRole).toJsonObject();
+    ui->textBrowser->setText(jobInfo.value("description").toString());
 }
 
 void MainWindow::onJobInfoRecevied(const QJsonObject &jobInfo)
 {
-    model->setData(model->index(hash[jobInfo.value("id").toString()], 3), jobInfo.value("payRate").toString());
+    model->setData(model->index(hash[jobInfo.value("id").toString()], 3), jobInfo.value("payRate").toString(), Qt::DisplayRole);
+    model->setData(model->index(hash[jobInfo.value("id").toString()], 3), jobInfo, Qt::UserRole);
 }
 
 void MainWindow::connectSignals()
